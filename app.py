@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+﻿from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from sadeh_engine import sadeh_search
 import os
@@ -17,7 +17,7 @@ def search():
     if not product:
         return jsonify({"error": "Please enter a product name."}), 400
     result = sadeh_search(product)
-        return jsonify(result)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
