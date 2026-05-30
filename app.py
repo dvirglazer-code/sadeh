@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from sadeh_engine import sadeh_search
 import os
@@ -14,9 +14,10 @@ def index():
 def search():
     data = request.get_json()
     product = data.get("product", "").strip()
+    country = data.get("country", "IL").strip()
     if not product:
         return jsonify({"error": "Please enter a product name."}), 400
-    result = sadeh_search(product)
+    result = sadeh_search(product, country)
     return jsonify(result)
 
 if __name__ == "__main__":

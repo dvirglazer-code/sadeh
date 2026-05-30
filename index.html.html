@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sadeh - Global Price Comparison</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#1d1d1f}
+
+/* HEADER */
+.topbar{background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:22px;font-weight:800;color:#1d1d1f;text-decoration:none;letter-spacing:-0.5px}
+.logo span{color:#0891b2}
+.topbar-links{display:flex;gap:20px;font-size:13px}
+.topbar-links a{color:#555;text-decoration:none;cursor:pointer;transition:color 0.2s}
+.topbar-links a:hover{color:#0891b2}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#0891b2 0%,#0e7490 60%,#164e63 100%);padding:80px 24px 100px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-80px;width:400px;height:400px;background:rgba(255,255,255,0.04);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-60px;width:300px;height:300px;background:rgba(255,255,255,0.03);border-radius:50%}
+.hero-title{font-size:48px;font-weight:800;color:white;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px;position:relative}
+.hero-title span{color:#fde047}
+.hero-sub{font-size:18px;color:rgba(255,255,255,0.8);margin-bottom:40px;font-weight:400;position:relative}
+.hero-search{display:flex;max-width:640px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative}
+.hero-search input{flex:1;padding:18px 20px;font-size:16px;border:none;outline:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1d1d1f}
+.hero-search select{padding:12px 10px;border:none;border-left:1px solid #eee;font-size:13px;background:white;outline:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#333;cursor:pointer}
+.hero-search button{background:#fde047;color:#1d1d1f;border:none;padding:18px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;white-space:nowrap;transition:background 0.2s}
+.hero-search button:hover{background:#facc15}
+.hero-badges{display:flex;justify-content:center;gap:20px;margin-top:24px;flex-wrap:wrap;position:relative}
+.hero-badge{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.9);padding:6px 14px;border-radius:20px;font-size:13px;backdrop-filter:blur(10px)}
+
+/* POPULAR TAGS */
+.tags-section{background:#f5f5f7;padding:20px 24px;border-bottom:1px solid rgba(0,0,0,0.06)}
+.tags-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tags-label{font-size:12px;color:#888;font-weight:500;white-space:nowrap}
+.tag{background:white;border:1px solid rgba(0,0,0,0.1);color:#333;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.tag:hover{background:#0891b2;color:white;border-color:#0891b2}
+
+/* CATEGORIES */
+.section{max-width:1000px;margin:0 auto;padding:48px 24px}
+.section-title{font-size:28px;font-weight:700;color:#1d1d1f;margin-bottom:6px;letter-spacing:-0.5px}
+.section-sub{font-size:15px;color:#888;margin-bottom:28px}
+.categories-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.cat-card{border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;position:relative;aspect-ratio:1.4;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.cat-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.15)}
+.cat-card-bg{position:absolute;inset:0;z-index:0}
+.cat-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.1) 60%);z-index:1}
+.cat-card-content{position:relative;z-index:2}
+.cat-emoji{font-size:28px;margin-bottom:6px}
+.cat-name{font-size:16px;font-weight:700;color:white;line-height:1.2}
+.cat-sub{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px}
+
+/* COLORS per category */
+.cat-gaming{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)}
+.cat-travel{background:linear-gradient(135deg,#006994,#0891b2,#22d3ee)}
+.cat-sport{background:linear-gradient(135deg,#064e3b,#065f46,#10b981)}
+.cat-electronics{background:linear-gradient(135deg,#312e81,#4c1d95,#7c3aed)}
+.cat-furniture{background:linear-gradient(135deg,#78350f,#92400e,#d97706)}
+.cat-car{background:linear-gradient(135deg,#1f2937,#374151,#6b7280)}
+.cat-fashion{background:linear-gradient(135deg,#831843,#9d174d,#ec4899)}
+
+/* RESULTS */
+.results-section{max-width:1000px;margin:0 auto;padding:0 24px 48px;display:none}
+.results-section.visible{display:block}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.results-title{font-size:22px;font-weight:700;color:#1d1d1f}
+.results-sub{font-size:13px;color:#888}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.price-card{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:16px;text-align:center;transition:all 0.2s}
+.price-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.1);transform:translateY(-2px)}
+.price-card.winner{border:2px solid #0891b2;background:#f0f9ff}
+.price-store{font-size:12px;font-weight:600;color:#555;margin-bottom:2px}
+.price-region{font-size:10px;color:#aaa;margin-bottom:8px}
+.price-amount{font-size:22px;font-weight:800;color:#1d1d1f}
+.price-card.winner .price-amount{color:#0891b2}
+.price-note{font-size:10px;color:#aaa;margin-top:4px}
+.price-stars{color:#f59e0b;font-size:11px;margin-top:4px}
+.winner-tag{display:inline-block;background:#0891b2;color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;margin-top:6px}
+.buy-btn{display:block;margin-top:10px;background:#0891b2;color:white;font-size:12px;font-weight:600;padding:8px;border-radius:8px;text-decoration:none;transition:background 0.2s}
+.buy-btn:hover{background:#0e7490}
+.verdict-box{background:linear-gradient(135deg,#0891b2,#0e7490);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.verdict-icon{font-size:28px}
+.verdict-text{font-size:15px;font-weight:600;color:white}
+.result-actions{display:flex;gap:8px;margin-bottom:16px}
+.action-btn{background:white;border:1px solid rgba(0,0,0,0.1);padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.action-btn:hover{background:#f0f9ff;border-color:#0891b2;color:#0891b2}
+.action-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+
+/* LOADER */
+.loader-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.9);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loader-overlay.visible{display:flex}
+.loader-spinner{width:40px;height:40px;border:4px solid #e0f2fe;border-top-color:#0891b2;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:15px;color:#0891b2;font-weight:500}
+
+/* ERROR */
+.error-box{background:#fff0f0;border:1px solid #fca5a5;border-radius:12px;padding:14px 18px;color:#dc2626;font-size:14px;margin-bottom:16px;display:none}
+
+/* PANELS */
+.panel{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:14px;margin:0 24px 16px;overflow:hidden;display:none}
+.panel.visible{display:block}
+.panel-header{background:#f5f5f7;border-bottom:1px solid rgba(0,0,0,0.06);padding:10px 16px;font-size:13px;font-weight:600;color:#333;display:flex;justify-content:space-between;align-items:center}
+.panel-clear{font-size:11px;color:#0891b2;cursor:pointer;background:none;border:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.panel-item{padding:10px 16px;font-size:13px;color:#444;border-bottom:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background 0.1s}
+.panel-item:hover{background:#f0f9ff;color:#0891b2}
+.panel-item:last-child{border-bottom:none}
+.panel-empty{padding:14px 16px;font-size:12px;color:#aaa;text-align:center}
+
+/* HOW IT WORKS */
+.how-section{background:#f5f5f7;padding:56px 24px}
+.how-inner{max-width:1000px;margin:0 auto}
+.how-title{font-size:28px;font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-0.5px}
+.how-sub{font-size:15px;color:#888;text-align:center;margin-bottom:36px}
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.how-card{background:white;border-radius:16px;padding:28px 20px;text-align:center}
+.how-num{width:40px;height:40px;background:#0891b2;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin:0 auto 16px}
+.how-card-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.how-card-text{font-size:13px;color:#888;line-height:1.6}
+
+/* STATS */
+.stats-section{background:#0891b2;padding:40px 24px}
+.stats-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;text-align:center}
+.stat-num{font-size:36px;font-weight:800;color:white}
+.stat-label{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
+
+/* FOOTER */
+.footer{background:#1d1d1f;padding:32px 24px;text-align:center;color:rgba(255,255,255,0.4);font-size:12px}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none}
+
+@media(max-width:600px){
+  .hero-title{font-size:32px}
+  .hero-search{flex-direction:column;border-radius:12px}
+  .hero-search input,.hero-search button,.hero-search select{width:100%;border-radius:0;border-left:none;border-top:1px solid #eee}
+  .categories-grid{grid-template-columns:repeat(2,1fr)}
+  .results-grid{grid-template-columns:repeat(2,1fr)}
+  .topbar-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Searching prices worldwide...</div>
+</div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a class="logo" href="#">Sadeh<span>.</span></a>
+  <div class="topbar-links">
+    <a onclick="togglePanel('historyPanel')">🕐 History</a>
+    <a onclick="togglePanel('favPanel')">⭐ Favorites</a>
+    <a href="#">Help</a>
+  </div>
+</nav>
+
+<!-- PANELS -->
+<div class="panel" id="historyPanel">
+  <div class="panel-header">🕐 Search History <button class="panel-clear" onclick="clearHistory()">Clear all</button></div>
+  <div id="historyList"><div class="panel-empty">No searches yet</div></div>
+</div>
+<div class="panel" id="favPanel">
+  <div class="panel-header">⭐ Saved Favorites <button class="panel-clear" onclick="clearFavorites()">Clear all</button></div>
+  <div id="favList"><div class="panel-empty">No favorites saved yet</div></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <h1 class="hero-title">Find the best price,<br><span>anywhere in the world</span></h1>
+  <p class="hero-sub">Compare prices across 6+ stores including shipping & tax</p>
+  <div class="hero-search">
+    <input type="text" id="heroInput" placeholder="Search any product in any language...">
+    <select id="userCountry">
+      <optgroup label="Middle East">
+        <option value="IL">🇮🇱 Israel</option>
+        <option value="AE">🇦🇪 UAE</option>
+        <option value="SA">🇸🇦 Saudi Arabia</option>
+        <option value="TR">🇹🇷 Turkey</option>
+      </optgroup>
+      <optgroup label="Europe">
+        <option value="GB">🇬🇧 UK</option>
+        <option value="DE">🇩🇪 Germany</option>
+        <option value="FR">🇫🇷 France</option>
+        <option value="IT">🇮🇹 Italy</option>
+        <option value="ES">🇪🇸 Spain</option>
+        <option value="NL">🇳🇱 Netherlands</option>
+        <option value="SE">🇸🇪 Sweden</option>
+        <option value="NO">🇳🇴 Norway</option>
+        <option value="DK">🇩🇰 Denmark</option>
+        <option value="FI">🇫🇮 Finland</option>
+        <option value="CH">🇨🇭 Switzerland</option>
+        <option value="AT">🇦🇹 Austria</option>
+        <option value="BE">🇧🇪 Belgium</option>
+        <option value="PL">🇵🇱 Poland</option>
+        <option value="PT">🇵🇹 Portugal</option>
+        <option value="CZ">🇨🇿 Czech Republic</option>
+        <option value="HU">🇭🇺 Hungary</option>
+        <option value="RO">🇷🇴 Romania</option>
+        <option value="GR">🇬🇷 Greece</option>
+      </optgroup>
+      <optgroup label="Americas">
+        <option value="US">🇺🇸 United States</option>
+        <option value="CA">🇨🇦 Canada</option>
+        <option value="MX">🇲🇽 Mexico</option>
+        <option value="BR">🇧🇷 Brazil</option>
+        <option value="AR">🇦🇷 Argentina</option>
+        <option value="CL">🇨🇱 Chile</option>
+        <option value="CO">🇨🇴 Colombia</option>
+      </optgroup>
+      <optgroup label="Asia">
+        <option value="JP">🇯🇵 Japan</option>
+        <option value="CN">🇨🇳 China</option>
+        <option value="KR">🇰🇷 South Korea</option>
+        <option value="IN">🇮🇳 India</option>
+        <option value="SG">🇸🇬 Singapore</option>
+        <option value="HK">🇭🇰 Hong Kong</option>
+        <option value="TW">🇹🇼 Taiwan</option>
+        <option value="TH">🇹🇭 Thailand</option>
+        <option value="MY">🇲🇾 Malaysia</option>
+        <option value="ID">🇮🇩 Indonesia</option>
+        <option value="PH">🇵🇭 Philippines</option>
+        <option value="VN">🇻🇳 Vietnam</option>
+      </optgroup>
+      <optgroup label="Oceania">
+        <option value="AU">🇦🇺 Australia</option>
+        <option value="NZ">🇳🇿 New Zealand</option>
+      </optgroup>
+    </select>
+    <button onclick="doSearch()">Compare Prices</button>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge">✓ 6+ stores worldwide</span>
+    <span class="hero-badge">✓ Shipping & tax included</span>
+    <span class="hero-badge">✓ 100+ languages</span>
+    <span class="hero-badge">✓ Always free</span>
+  </div>
+</section>
+
+<!-- POPULAR TAGS -->
+<div class="tags-section">
+  <div class="tags-inner">
+    <span class="tags-label">🔥 Trending:</span>
+    <span class="tag" onclick="quickSearch('iPhone 16 Pro')">iPhone 16 Pro</span>
+    <span class="tag" onclick="quickSearch('Samsung Galaxy S25')">Samsung S25</span>
+    <span class="tag" onclick="quickSearch('MacBook Air M3')">MacBook Air M3</span>
+    <span class="tag" onclick="quickSearch('PlayStation 5')">PlayStation 5</span>
+    <span class="tag" onclick="quickSearch('AirPods Pro 2')">AirPods Pro</span>
+    <span class="tag" onclick="quickSearch('Sony WH-1000XM5')">Sony WH-1000XM5</span>
+    <span class="tag" onclick="quickSearch('Nintendo Switch 2')">Nintendo Switch 2</span>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-section" id="resultsSection">
+  <div class="error-box" id="errorBox"></div>
+  <div id="resultContent"></div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="section">
+  <h2 class="section-title">Shop by Category</h2>
+  <p class="section-sub">Click a category to discover the best deals</p>
+  <div class="categories-grid">
+    <div class="cat-card cat-electronics" onclick="searchCategory('electronics')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">📱</div>
+        <div class="cat-name">Electronics</div>
+        <div class="cat-sub">Phones, laptops, tablets & more</div>
+      </div>
+    </div>
+    <div class="cat-card cat-gaming" onclick="searchCategory('gaming')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">🎮</div>
+        <div class="cat-name">Gaming</div>
+        <div class="cat-sub">Consoles, games & accessories</div>
+      </div>
+    </div>
+    <div class="cat-card cat-sport" onclick="searchCategory('sport')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">🏋️</div>
+        <div class="cat-name">Sport & Fitness</div>
+        <div class="cat-sub">Equipment & activewear</div>
+      </div>
+    </div>
+    <div class="cat-card cat-travel" onclick="searchCategory('travel')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">✈️</div>
+        <div class="cat-name">Travel Gear</div>
+        <div class="cat-sub">Luggage, bags & accessories</div>
+      </div>
+    </div>
+    <div class="cat-card cat-furniture" onclick="searchCategory('furniture')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">🪑</div>
+        <div class="cat-name">Furniture</div>
+        <div class="cat-sub">Home & office furniture</div>
+      </div>
+    </div>
+    <div class="cat-card cat-car" onclick="searchCategory('car')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">🚗</div>
+        <div class="cat-name">Car Accessories</div>
+        <div class="cat-sub">Gadgets & car gear</div>
+      </div>
+    </div>
+    <div class="cat-card cat-fashion" onclick="searchCategory('fashion')">
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-emoji">👗</div>
+        <div class="cat-name">Fashion & Style</div>
+        <div class="cat-sub">Clothes, shoes & jewelry</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-inner">
+    <h2 class="how-title">How Sadeh works</h2>
+    <p class="how-sub">Find the best price in 3 simple steps</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <div class="how-card-title">Search</div>
+        <div class="how-card-text">Type any product in any language. We understand Hebrew, Arabic, Russian, and 100+ more.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <div class="how-card-title">Compare</div>
+        <div class="how-card-text">We check 6+ stores worldwide and calculate the real price including shipping & tax to your country.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <div class="how-card-title">Buy & Save</div>
+        <div class="how-card-text">Click Buy Now to go directly to the cheapest store and complete your purchase.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-inner">
+    <div><div class="stat-num">6+</div><div class="stat-label">Stores compared</div></div>
+    <div><div class="stat-num">45+</div><div class="stat-label">Countries</div></div>
+    <div><div class="stat-num">100+</div><div class="stat-label">Languages</div></div>
+    <div><div class="stat-num">Free</div><div class="stat-label">Always free</div></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">© 2025 Sadeh — Global Price Comparison | <a href="#">Terms of Use</a> | <a href="#">Privacy</a></div>
+
+<script>
+const CATEGORIES = {
+  electronics: ['iPhone 16 Pro', 'Samsung Galaxy S25', 'MacBook Air M3', 'iPad Pro', 'Sony WH-1000XM5'],
+  gaming: ['PlayStation 5', 'Xbox Series X', 'Nintendo Switch 2', 'Steam Deck', 'Razer DeathAdder'],
+  sport: ['Garmin Forerunner 265', 'Theragun Pro', 'Peloton Bike', 'Nike Air Zoom Pegasus', 'Whoop 4.0'],
+  travel: ['Samsonite Cosmolite', 'Away Carry-On', 'Bose QuietComfort 45', 'GoPro Hero 13', 'Osprey Farpoint 40'],
+  furniture: ['Herman Miller Aeron', 'IKEA KALLAX', 'Autonomous SmartDesk', 'Casper Wave Mattress', 'IKEA POANG'],
+  car: ['Garmin DriveSmart', 'Anker PowerDrive', 'Thinkware U1000 Dashcam', 'Mophie Car Mount', 'WeatherTech FloorMats'],
+  fashion: ['Ray-Ban Wayfarer', 'Nike Air Force 1', 'Apple Watch Series 10', 'Levi\'s 501 Jeans', 'Adidas Stan Smith']
+};
+
+let currentResult = null;
+let categoryProducts = [];
+let categoryIndex = 0;
+let currentCategory = null;
+
+function getHistory(){try{return JSON.parse(localStorage.getItem('sadeh_history')||'[]')}catch(e){return[]}}
+function saveHistory(h){localStorage.setItem('sadeh_history',JSON.stringify(h))}
+function getFavorites(){try{return JSON.parse(localStorage.getItem('sadeh_favorites')||'[]')}catch(e){return[]}}
+function saveFavorites(f){localStorage.setItem('sadeh_favorites',JSON.stringify(f))}
+
+function addToHistory(product){
+  let h=getHistory();
+  h=h.filter(x=>x.product!==product);
+  h.unshift({product,time:new Date().toLocaleTimeString()});
+  if(h.length>20)h=h.slice(0,20);
+  saveHistory(h);renderHistory();
+}
+
+function renderHistory(){
+  const h=getHistory();
+  const el=document.getElementById('historyList');
+  if(!h.length){el.innerHTML='<div class="panel-empty">No searches yet</div>';return;}
+  el.innerHTML=h.map(x=>`<div class="panel-item" onclick="quickSearch('${x.product.replace(/'/g,"\\'")}')"><span>🔍 ${x.product}</span><span style="font-size:10px;color:#aaa">${x.time}</span></div>`).join('');
+}
+
+function clearHistory(){saveHistory([]);renderHistory();}
+
+function renderFavorites(){
+  const favs=getFavorites();
+  const el=document.getElementById('favList');
+  if(!favs.length){el.innerHTML='<div class="panel-empty">No favorites saved yet</div>';return;}
+  el.innerHTML=favs.map(x=>`<div class="panel-item" onclick="quickSearch('${x.product.replace(/'/g,"\\'")}')"><div><div style="font-weight:600">${x.product}</div><div style="font-size:11px;color:#0891b2">${x.verdict}</div></div><span style="font-size:10px;color:#aaa">${x.time}</span></div>`).join('');
+}
+
+function clearFavorites(){saveFavorites([]);renderFavorites();}
+
+function togglePanel(id){
+  ['historyPanel','favPanel'].forEach(p=>{
+    const el=document.getElementById(p);
+    if(p===id)el.classList.toggle('visible');
+    else el.classList.remove('visible');
+  });
+  if(id==='historyPanel')renderHistory();
+  if(id==='favPanel')renderFavorites();
+}
+
+function toggleFavorite(){
+  if(!currentResult)return;
+  const product=currentResult.product;
+  let favs=getFavorites();
+  const idx=favs.findIndex(x=>x.product===product);
+  if(idx>=0){favs.splice(idx,1);}
+  else{favs.unshift({product,verdict:currentResult.verdict,time:new Date().toLocaleTimeString()});}
+  saveFavorites(favs);renderFavorites();
+  renderResultActions();
+}
+
+function shareResult(){
+  if(!currentResult)return;
+  const text=`Check out ${currentResult.product} prices on Sadeh!\n${currentResult.verdict}\n${window.location.href}`;
+  if(navigator.share){navigator.share({title:'Sadeh',text});}
+  else{navigator.clipboard.writeText(text).then(()=>alert('Copied to clipboard!'));}
+}
+
+function starsHTML(rating){
+  if(!rating)return'';
+  const full=Math.round(rating);
+  let s='';
+  for(let i=1;i<=5;i++)s+=i<=full?'★':'☆';
+  return`<div class="price-stars">${s} ${rating.toFixed(1)}</div>`;
+}
+
+function quickSearch(product){
+  document.getElementById('heroInput').value=product;
+  doSearch();
+}
+
+function searchCategory(cat){
+  currentCategory=cat;
+  categoryProducts=CATEGORIES[cat]||[];
+  categoryIndex=0;
+  if(categoryProducts.length>0){
+    quickSearch(categoryProducts[0]);
+  }
+}
+
+async function doSearch(){
+  const product=document.getElementById('heroInput').value.trim();
+  const country=document.getElementById('userCountry').value;
+  if(!product){showError('Please enter a product name.');return;}
+  document.getElementById('errorBox').style.display='none';
+  document.getElementById('loader').classList.add('visible');
+  try{
+    const res=await fetch('/search',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({product,country})
+    });
+    const data=await res.json();
+    if(!res.ok||data.error){showError(data.error||'Server error');return;}
+    currentResult=data;
+    addToHistory(product);
+    displayResults(data);
+    document.getElementById('resultsSection').classList.add('visible');
+    document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    showError('Cannot connect to server. Please try again.');
+  }finally{
+    document.getElementById('loader').classList.remove('visible');
+  }
+}
+
+function renderResultActions(){
+  const favs=getFavorites();
+  const isFav=currentResult&&favs.some(x=>x.product===currentResult.product);
+  return`<button class="action-btn${isFav?' active':''}" onclick="toggleFavorite()">${isFav?'⭐ Saved':'☆ Save'}</button>
+    <button class="action-btn" onclick="shareResult()">🔗 Share</button>`;
+}
+
+function displayResults(d){
+  const grid=d.results.map((r,i)=>`
+    <div class="price-card${i===0?' winner':''}">
+      <div class="price-store">${r.flag} ${r.store}</div>
+      <div class="price-region">${r.region}</div>
+      <div class="price-amount">${r.price_display}</div>
+      ${starsHTML(r.rating)}
+      <div class="price-note">${r.note}</div>
+      ${i===0?'<div class="winner-tag">✓ Best Price</div>':''}
+      ${r.link?`<a href="${r.link}" target="_blank" class="buy-btn">Buy Now →</a>`:''}
+    </div>`).join('');
+
+  document.getElementById('resultContent').innerHTML=`
+    <div class="verdict-box">
+      <div class="verdict-icon">💰</div>
+      <div class="verdict-text">${d.verdict}</div>
+    </div>
+    <div class="results-header">
+      <div>
+        <div class="results-title">${d.product}</div>
+        <div class="results-sub">Results from ${d.results.length} stores · Exchange rate: ₪${d.exchange_rate} / $1</div>
+      </div>
+      <div class="result-actions">${renderResultActions()}</div>
+    </div>
+    <div class="results-grid">${grid}</div>`;
+}
+
+function showError(msg){
+  const el=document.getElementById('errorBox');
+  el.textContent=msg;
+  el.style.display='block';
+  document.getElementById('resultsSection').classList.add('visible');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+</script>
+</body>
+</html>
